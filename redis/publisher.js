@@ -1,25 +1,20 @@
-// publisher.js
-const redis = require('redis');
-const publisher = redis.createClient();
+const redis = require("redis");
 
-publisher.on('connect', () => {
-  console.log('Redis client connected to the server');
-});
+const publisher = redis.createClient({ url: "redis://localhost:6379" });
+publisher.connect();
 
-publisher.on('error', (err) => {
-  console.log('Redis client could not connect to the server', err);
-});
+let intervalCycles = 0;
+setInterval(async () => {
+  intervalCycles++;
+  const counter = await publisher.incr("counter");
+  publisher.publish("counter.updates", `New counter value: ${counter}`);
+}, 2500);
 
-// 메시지를 발행하는 함수
-function publishMessage(channel, message) {
-  publisher.publish(channel, message, (error, count) => {
-    if (error) {
-      console.error('Failed to publish message', error);
-    } else {
-      console.log(`Message sent to ${count} subscribers`);
-    }
-  });
-}
-
-// 'test-channel' 채널에 'Hello, World!' 메시지를 발행
-publishMessage('test-channel', 'Hello, World!');
+setInterval(async () => {
+  publisher.publish(
+    "healthcheck",
+    JSON.stringify({
+      intervalCycles: `Right now, ${intervalCycles} intervals has been performed`,
+    })
+  );
+}, 5000);

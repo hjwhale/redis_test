@@ -42,7 +42,8 @@ module.exports = class {
       _setRedis() {
         this._setRedisClient();
 
-        this.client.connect().then();
+        //this.client.connect().then();
+        this.client.connect();
 
         this.client.on('connect', this._connectHandler);
         //connection error
@@ -80,7 +81,8 @@ module.exports = class {
         //this.client = redis.createClient(`redis://${conf.user}:${conf.password}@${conf.host}:${conf.port}`);   'redis://alice:foobared@awesome.redis.server:6380'
 
       //  this.client = redis.createClient( `url: redis://127.0.0.1:6379'`);  // redis.createClient('redis://127.0.0.1:6379');
-        this.client = redis.createClient({ legacyMode: true }); 
+        //this.client = redis.createClient({ legacyMode: true }); 
+        this.client = redis.createClient({ url: "redis://localhost:6379" });
         
       }
   }

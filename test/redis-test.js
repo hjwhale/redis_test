@@ -27,6 +27,21 @@ describe("redis pub/sub Test", () => {
       console.log("channel HappyKoo subscribe complete");
      
       //구독 완료 했을 때
+      subscriber.on("subscribe", (channel, count) => {
+        expect(channel).to.equal(channelName);
+        if(++subCnt === subscribers.length) {
+          //메시지 전송
+          publisher.publish(channelName, pubMsg);
+        }
+      });
+
+      subscriber.on("message", (channel, message) => {
+        expect(channel).to.equal(channelName);
+        expect(message).to.equal(pubMsg);
+        if(++msgCnt === subscribers.length) {
+          done();
+        }
+      });
      
     });
   });

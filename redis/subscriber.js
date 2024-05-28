@@ -1,10 +1,13 @@
-const redis = require('redis');
+const redis = require("redis");
 
-const subscriber = redis.createClient();
+const subscriber = redis.createClient({ url: "redis://localhost:6379" });
+subscriber.connect();
 
-subscriber.on('message', (channel, message) => {
-  console.log(`Received message: ${message} from channel: ${channel}`);
+subscriber.subscribe("counter.updates", async (message) => {
+  console.log(message);
 });
 
-// 'test-channel' 채널을 구독
-subscriber.subscribe('test-channel');
+subscriber.subscribe("healthcheck", (message) => {
+  const parsed = JSON.parse(message);
+  console.log(parsed.intervalCycles);
+});
